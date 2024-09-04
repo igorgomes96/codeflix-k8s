@@ -2,33 +2,15 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: hello-cluster
+  name: fullcycle
   region: us-east-2
-  version: "1.29"
-
-nodeGroups:
-  - name: self-managed
-    instanceType: t3.micro
-    desiredCapacity: 1
-    labels:
-      type: self-managed
-      environment: dev
-
-managedNodeGroups:
-  - name: managed
-    instanceType: t3.micro
-    desiredCapacity: 1
-    maxSize: 2
-    labels:
-      type: managed
-      environment: prod
+  version: "1.30"
 
 fargateProfiles:
   - name: fp-default
     selectors:
       - namespace: default
       - namespace: kube-system
-  - name: fp-dev
+  - name: codeflix
     selectors:
-      - namespace: dev
-
+      - namespace: codeflix

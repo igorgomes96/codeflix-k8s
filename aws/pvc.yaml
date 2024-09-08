@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-pvc
+  namespace: codeflix
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: gp3-storageclass
+  resources:
+    requests:
+      storage: 1Gi

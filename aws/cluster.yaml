@@ -19,6 +19,15 @@ managedNodeGroups:
       withAddonPolicies:
         ebs: true
 
+  - name: ng-messaging
+    instanceType: t3.small
+    desiredCapacity: 1
+    labels:
+      role: messaging
+    iam:
+      withAddonPolicies:
+        ebs: true
+
 fargateProfiles:
   - name: fp-default
     selectors:

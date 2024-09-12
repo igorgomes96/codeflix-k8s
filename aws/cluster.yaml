@@ -6,6 +6,19 @@ metadata:
   region: us-east-2
   version: "1.30"
 
+iam:
+  withOIDC: true
+
+managedNodeGroups:
+  - name: ng-db
+    instanceType: t3.small
+    desiredCapacity: 1
+    labels:
+      role: db
+    iam:
+      withAddonPolicies:
+        ebs: true
+
 fargateProfiles:
   - name: fp-default
     selectors:
@@ -14,3 +27,9 @@ fargateProfiles:
   - name: codeflix
     selectors:
       - namespace: codeflix
+        labels:
+          role: app
+
+addons:
+  - name: aws-ebs-csi-driver
+    version: latest

@@ -12,32 +12,32 @@ iam:
 managedNodeGroups:
   - name: ng-db
     instanceType: t3.small
-    desiredCapacity: 1
+    desiredCapacity: 2
     labels:
       role: db
     iam:
       withAddonPolicies:
         ebs: true
 
-  - name: ng-messaging
-    instanceType: t3.small
-    desiredCapacity: 1
-    labels:
-      role: messaging
-    iam:
-      withAddonPolicies:
-        ebs: true
+#   - name: ng-messaging
+#     instanceType: t3.small
+#     desiredCapacity: 1
+#     labels:
+#       role: messaging
+#     iam:
+#       withAddonPolicies:
+#         ebs: true
 
-fargateProfiles:
-  - name: fp-default
-    selectors:
-      - namespace: default
-      - namespace: kube-system
-  - name: codeflix
-    selectors:
-      - namespace: codeflix
-        labels:
-          role: app
+# fargateProfiles:
+#   - name: fp-default
+#     selectors:
+#       - namespace: default
+#       - namespace: kube-system
+#   - name: codeflix
+#     selectors:
+#       - namespace: codeflix
+#         labels:
+#           role: app
 
 addons:
   - name: aws-ebs-csi-driver

@@ -7,7 +7,7 @@ spec:
   instances: 1
   db:
     vendor: mysql
-    host: mysql-0.mysql-headless.codeflix.svc.cluster.local
+    host: mysql-0.mysql-h.codeflix.svc.cluster.local
     usernameSecret:
       name: db-secret
       key: username
@@ -25,3 +25,8 @@ spec:
     limits:
       cpu: 1000m
       memory: 1Gi
+  unsupported:
+    podTemplate:
+      metadata:
+        labels:
+          role: app

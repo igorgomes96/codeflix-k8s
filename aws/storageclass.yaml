@@ -5,6 +5,6 @@ metadata:
 allowVolumeExpansion: true 
 provisioner: ebs.csi.aws.com
 volumeBindingMode: WaitForFirstConsumer
-reclaimPolicy: Retain
+reclaimPolicy: Delete
 parameters:
   type: gp3

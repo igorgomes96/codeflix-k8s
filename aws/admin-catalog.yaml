@@ -28,3 +28,15 @@ spec:
               value: rabbitmq.codeflix.svc.cluster.local
             - name: Keycloak__auth-server-url
               value: http://keycloak-service:8080
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: gcp_credentials.json
+            - name: Storage__BucketName
+              value: fc3-medias-catalog-admin
+          volumeMounts:
+            - name: gcp-credentials-volume
+              mountPath: /app/gcp_credentials.json
+              subPath: gcp_credentials.json
+      volumes:
+        - name: gcp-credentials-volume
+          secret:
+            secretName: gcp-credentials-secret

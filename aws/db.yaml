@@ -27,6 +27,15 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/mysql
               name: mysql-volume
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "
+                  until mysql -u root -p${MYSQL_ROOT_PASSWORD} -e 'SELECT 1' > /dev/null 2>&1; do
+                    echo 'Waiting for MySQL to be ready...';
+                    sleep 5;
+                  done;
+                  mysql -u root -p${MYSQL_ROOT_PASSWORD} -e 'CREATE SCHEMA IF NOT EXISTS catalog;CREATE SCHEMA IF NOT EXISTS keycloak;'"]
 
   volumeClaimTemplates:
   - metadata:

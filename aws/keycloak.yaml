@@ -17,6 +17,7 @@ spec:
   http:
     httpEnabled: true
   hostname:
+    hostname: http://keycloak-service:8080
     strict: false
   resources:
     requests:

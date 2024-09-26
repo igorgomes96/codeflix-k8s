@@ -1,7 +1,7 @@
 cluster_name=fullcycle
-account=304851244121
+account=123821430529
 region=us-east-2
-vpc_id=vpc-0ad9b1f77fce20a3c
+vpc_id=vpc-0baf6761e333e0dad
 
 eksctl utils associate-iam-oidc-provider --cluster $cluster_name --approve
 

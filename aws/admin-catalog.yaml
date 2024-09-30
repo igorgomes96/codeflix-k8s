@@ -14,7 +14,7 @@ spec:
     metadata:
       labels:
         app: admin-catalog
-        role: app
+        filebeat_collector: "true"
     spec:
       containers:
         - name: admin-catalog

@@ -15,7 +15,7 @@ spec:
         app: mysql
     spec:
       nodeSelector:
-        role: db
+        type: ec2
       containers:
         - name: mysql
           image: mysql

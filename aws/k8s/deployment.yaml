@@ -14,6 +14,7 @@ spec:
     metadata:
       labels:
         app: nginx
+        schedule_on: fargate
     spec:
       containers:
         - name: nginx

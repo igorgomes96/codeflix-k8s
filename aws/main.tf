@@ -41,7 +41,6 @@ module "eks" {
   enable_irsa = true
 
   cluster_addons = {
-    coredns    = {}
     kube-proxy = {}
     vpc-cni    = {}
     aws-ebs-csi-driver = {
@@ -66,17 +65,6 @@ module "eks" {
     }
   }
 
-  # node_security_group_additional_rules = {
-  #   ingress_ec2_tcp = {
-  #     description                   = "Access EKS from EC2 instance."
-  #     protocol                      = "tcp"
-  #     from_port                     = 0
-  #     to_port                       = 65535
-  #     type                          = "ingress"
-  #     source_cluster_security_group = true
-  #   }
-  # }
-
   fargate_profiles = {
     default = {
       selectors = [
@@ -85,7 +73,8 @@ module "eks" {
         },
         {
           namespace = "kube-system"
-      }]
+        }
+      ]
     }
     codeflix = {
       selectors = [{
@@ -96,6 +85,11 @@ module "eks" {
       }]
     }
   }
+}
+
+resource "aws_eks_addon" "example" {
+  cluster_name                = module.eks.cluster_name
+  addon_name                  = "coredns"
 }
 
 resource "aws_security_group_rule" "node_groups_sg_rule" {

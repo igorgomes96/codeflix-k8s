@@ -14,8 +14,8 @@ spec:
     metadata:
       labels:
         app: front
-        schedule_on: fargate
     spec:
       containers:
         - name: front
-          image: igorgomes96/fc3-admin-catalogo-de-videos-react:latest
+          image: igorgomes96/fc3-admin-catalogo-de-videos-react:v4
+          imagePullPolicy: Always

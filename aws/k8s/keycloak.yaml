@@ -16,6 +16,8 @@ spec:
       key: password
   http:
     httpEnabled: true
+  proxy:
+    headers: xforwarded
   hostname:
     strict: false
   resources:
@@ -30,3 +32,8 @@ spec:
       metadata:
         labels:
           schedule_on: fargate
+      # spec:
+      #   containers:
+      #     - env:
+      #         - name: PROXY_ADDRESS_FORWARDING
+      #           value: "true"

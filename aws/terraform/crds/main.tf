@@ -94,16 +94,16 @@ resource "helm_release" "eck" {
   depends_on = [kubernetes_namespace.codeflix]
 }
 
-resource "helm_release" "nginx" {
-  name       = "nginx"
-  repository = "https://kubernetes.github.io/ingress-nginx"
-  chart      = "ingress-nginx"
-  namespace  = "kube-system"
+# resource "helm_release" "nginx" {
+#   name       = "nginx"
+#   repository = "https://kubernetes.github.io/ingress-nginx"
+#   chart      = "ingress-nginx"
+#   namespace  = "kube-system"
 
-  values = [file("../../k8s/nginx-values.yaml")]
+#   values = [file("../../k8s/nginx-values.yaml")]
 
-  set {
-    name  = "allowSnippetAnnotations"
-    value = "true"
-  }
-}
+#   set {
+#     name  = "allowSnippetAnnotations"
+#     value = "true"
+#   }
+# }

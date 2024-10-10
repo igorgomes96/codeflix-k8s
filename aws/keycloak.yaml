@@ -16,8 +16,9 @@ spec:
       key: password
   http:
     httpEnabled: true
+  proxy:
+    headers: xforwarded
   hostname:
-    hostname: http://keycloak-service:8080
     strict: false
   resources:
     requests:

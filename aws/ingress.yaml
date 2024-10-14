@@ -40,3 +40,10 @@ spec:
                 name: admincatalog
                 port:
                   number: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: front-service
+                port:
+                  number: 80

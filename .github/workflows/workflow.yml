@@ -8,6 +8,8 @@ on:
   push:
     branches: [ "section/3_aws_eks" ]
   pull_request:
+  workflow_dispatch:
+  
 
 permissions:
   contents: read

@@ -50,7 +50,7 @@ resource "kubernetes_manifest" "rmq" {
 }
 
 locals {
-  rmq_objects = [for obj in split("---", file("../../k8s/rabbitmq-topology.yaml")) : yamldecode(obj) if obj != ""]
+  rmq_objects        = [for obj in split("---", file("../../k8s/rabbitmq-topology.yaml")) : yamldecode(obj) if obj != ""]
   beats_rbac_objects = [for obj in split("---", file("../../k8s/beats-rbac.yaml")) : yamldecode(obj) if obj != ""]
 }
 
@@ -93,13 +93,13 @@ resource "kubernetes_manifest" "admin_catalog_service" {
 }
 
 resource "kubernetes_manifest" "elasticsearch" {
-  manifest = yamldecode(file("../../k8s/elasticsearch.yaml"))
+  manifest        = yamldecode(file("../../k8s/elasticsearch.yaml"))
   computed_fields = ["spec.nodeSets"]
 }
 
 resource "kubernetes_manifest" "beats_rbac" {
-  for_each   = { for definition in local.beats_rbac_objects : definition.metadata.name => definition }
-  manifest   = each.value
+  for_each = { for definition in local.beats_rbac_objects : definition.metadata.name => definition }
+  manifest = each.value
 }
 
 resource "kubernetes_manifest" "beats" {
@@ -116,7 +116,7 @@ resource "kubernetes_manifest" "kibana" {
     force_conflicts = true
   }
   depends_on = [kubernetes_manifest.elasticsearch]
-  
+
 }
 
 resource "kubernetes_manifest" "front_admin_catalog" {
@@ -139,6 +139,6 @@ resource "kubernetes_manifest" "front_admin_catalog_service" {
 }
 
 resource "kubernetes_manifest" "ingress" {
-  manifest = yamldecode(file("../../k8s/ingress.yaml"))
-  depends_on = [ kubernetes_manifest.admin_catalog_service ]
+  manifest   = yamldecode(file("../../k8s/ingress.yaml"))
+  depends_on = [kubernetes_manifest.admin_catalog_service]
 }

@@ -17,6 +17,12 @@ terraform {
       version = "2.15.0"
     }
   }
+
+  backend "s3" {
+    bucket         = "codeflix-terraform"
+    key            = "states/terraform.manifests.tfstate"
+    dynamodb_table = "tf-state-locking"
+  }
 }
 
 provider "aws" {

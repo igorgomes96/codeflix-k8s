@@ -105,6 +105,8 @@ resource "kubernetes_service_account" "lb_service_account" {
       "eks.amazonaws.com/sts-regional-endpoints" = "true"
     }
   }
+
+  depends_on = [module.eks]
 }
 
 resource "helm_release" "lb" {

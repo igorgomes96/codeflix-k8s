@@ -17,7 +17,7 @@ terraform {
       version = "2.15.0"
     }
   }
-  
+
   backend "s3" {
     bucket         = "codeflix-terraform"
     key            = "states/terraform.cluster.tfstate"
@@ -26,7 +26,7 @@ terraform {
 }
 
 provider "aws" {
-  region  = "us-east-2"
+  region = "us-east-2"
 }
 
 provider "kubernetes" {

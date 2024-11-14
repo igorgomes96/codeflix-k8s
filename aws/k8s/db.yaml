@@ -49,4 +49,4 @@ spec:
       resources:
         requests:
           storage: 1Gi
-      storageClassName: gp3-storageclass
+      storageClassName: custom-storageclass

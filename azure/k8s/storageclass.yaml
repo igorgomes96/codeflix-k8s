@@ -1,10 +1,10 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: gp3-storageclass
+  name: custom-storageclass
 allowVolumeExpansion: true 
-provisioner: ebs.csi.aws.com
+provisioner: disk.csi.azure.com
 volumeBindingMode: WaitForFirstConsumer
 reclaimPolicy: Delete
 parameters:
-  type: gp3
+  skuname: StandardSSD_LRS

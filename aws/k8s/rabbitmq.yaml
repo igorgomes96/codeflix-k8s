@@ -6,7 +6,7 @@ metadata:
 spec:
   replicas: 1
   persistence:
-    storageClassName: gp3-storageclass
+    storageClassName: custom-storageclass
     storage: 1Gi
   resources:
     requests:

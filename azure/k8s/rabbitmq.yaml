@@ -15,12 +15,3 @@ spec:
     limits:
       cpu: 500m
       memory: 1Gi
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-        - matchExpressions:
-          - key: type
-            operator: In
-            values:
-            - ec2

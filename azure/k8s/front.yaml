@@ -17,5 +17,5 @@ spec:
     spec:
       containers:
         - name: front
-          image: igorgomes96/fc3-admin-catalogo-de-videos-react:v5
+          image: igorgomes96/fc3-admin-catalogo-de-videos-react:v6
           imagePullPolicy: Always

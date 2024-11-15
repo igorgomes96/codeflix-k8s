@@ -27,8 +27,3 @@ spec:
     limits:
       cpu: 1000m
       memory: 1Gi
-  unsupported:
-    podTemplate:
-      metadata:
-        labels:
-          schedule_on: fargate

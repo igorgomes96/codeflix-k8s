@@ -27,7 +27,7 @@ spec:
             - name: RabbitMQ__Hostname
               value: rabbitmq.codeflix.svc.cluster.local
             - name: Keycloak__auth-server-url
-              value: http://k8s-codeflix-ingress-e4bc264c87-677970469.us-east-2.elb.amazonaws.com
+              value: http://172.171.41.60
             - name: Storage__BucketName
               value: fc3-medias-catalog-admin
             - name: GOOGLE_APPLICATION_CREDENTIALS

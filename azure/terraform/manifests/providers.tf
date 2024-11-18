@@ -2,9 +2,9 @@ terraform {
   required_version = "~> 1.9"
 
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
+    azurerm = {
+      source = "hashicorp/azurerm"
+      version = "4.10.0"
     }
 
     kubernetes = {
@@ -18,15 +18,17 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket         = "codeflix-terraform"
-    key            = "states/terraform.manifests.tfstate"
-    dynamodb_table = "tf-state-locking"
+  backend "azurerm" {
+    resource_group_name  = "fullcycle-terraform-rg"
+    storage_account_name = "fcremotestatetf"
+    container_name       = "tfstate"
+    key                  = "terraform.manifests.tfstate"
   }
 }
 
-provider "aws" {
-  region = "us-east-2"
+provider "azurerm" {
+  subscription_id = "fffde95a-cf63-45fa-973a-5051457297c6"
+  features {}
 }
 
 provider "kubernetes" {

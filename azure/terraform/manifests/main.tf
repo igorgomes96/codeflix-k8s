@@ -92,33 +92,6 @@ resource "kubernetes_manifest" "admin_catalog_service" {
   manifest = yamldecode(file("../../k8s/admin-catalog-service.yaml"))
 }
 
-resource "kubernetes_manifest" "elasticsearch" {
-  manifest        = yamldecode(file("../../k8s/elasticsearch.yaml"))
-  computed_fields = ["spec.nodeSets"]
-}
-
-resource "kubernetes_manifest" "beats_rbac" {
-  for_each = { for definition in local.beats_rbac_objects : definition.metadata.name => definition }
-  manifest = each.value
-}
-
-resource "kubernetes_manifest" "beats" {
-  manifest = yamldecode(file("../../k8s/beats.yaml"))
-  field_manager {
-    force_conflicts = true
-  }
-  depends_on = [kubernetes_manifest.beats_rbac, kubernetes_manifest.elasticsearch]
-}
-
-resource "kubernetes_manifest" "kibana" {
-  manifest = yamldecode(file("../../k8s/kibana.yaml"))
-  field_manager {
-    force_conflicts = true
-  }
-  depends_on = [kubernetes_manifest.elasticsearch]
-
-}
-
 resource "kubernetes_manifest" "front_admin_catalog" {
   manifest = yamldecode(file("../../k8s/front.yaml"))
   wait {

@@ -1,145 +1,64 @@
-# Criação da VPC e Subnets
-module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
-  version = "4.0.0"
+locals {
+  resource_group_name = "aks-fullcycle-rg"
+  location            = "East US"
+  vnet_address_space  = ["10.240.0.0/12"]
+  appgw_subnet_cidr   = "10.255.0.0/24"
+  aks_name            = "aks-fullcycle"
+  appgw_name          = "gateway"
+  node_vm_size        = "Standard_B2s"
+  node_count          = 4
+}
 
-  name = "fullcycle-vpc"
-  cidr = "10.0.0.0/16"
+resource "azurerm_resource_group" "aks_rg" {
+  name     = local.resource_group_name
+  location = local.location
+}
 
-  azs             = ["us-east-2a", "us-east-2b", "us-east-2c"]
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+resource "azurerm_virtual_network" "aks_vnet" {
+  name                = "aks-vnet"
+  address_space       = local.vnet_address_space
+  location            = azurerm_resource_group.aks_rg.location
+  resource_group_name = azurerm_resource_group.aks_rg.name
+}
 
-  enable_nat_gateway = true
-  single_nat_gateway = true
+resource "azurerm_subnet" "aks_subnet" {
+  name                 = "aks-subnet"
+  resource_group_name  = azurerm_resource_group.aks_rg.name
+  virtual_network_name = azurerm_virtual_network.aks_vnet.name
+  address_prefixes     = ["10.254.0.0/16"]
+}
 
-  public_subnet_tags = {
-    "kubernetes.io/role/elb" = 1
+resource "azurerm_kubernetes_cluster" "aks" {
+  name                = local.aks_name
+  location            = azurerm_resource_group.aks_rg.location
+  resource_group_name = azurerm_resource_group.aks_rg.name
+  dns_prefix          = "aks-${local.aks_name}"
+
+  default_node_pool {
+    name               = "default"
+    node_count         = local.node_count
+    vm_size            = local.node_vm_size
+    vnet_subnet_id     = azurerm_subnet.aks_subnet.id
   }
 
-  private_subnet_tags = {
-    "kubernetes.io/role/internal-elb" = 1
+  sku_tier = "Free"
+
+  identity {
+    type = "SystemAssigned"
   }
 
-  tags = {
-    Name = "fullcycle-vpc"
+  network_profile {
+    network_plugin = "azure"
+  }
+
+  ingress_application_gateway {
+    gateway_name = local.appgw_name
+    subnet_cidr = local.appgw_subnet_cidr
   }
 }
 
-# Criação do cluster EKS
-module "eks" {
-  source          = "terraform-aws-modules/eks/aws"
-  cluster_name    = "fullcycle"
-  cluster_version = "1.30"
-  vpc_id          = module.vpc.vpc_id
-  subnet_ids      = module.vpc.private_subnets
-
-  cluster_endpoint_public_access           = true
-  enable_cluster_creator_admin_permissions = true
-
-  # Habilitando OIDC para o cluster
-  enable_irsa = true
-
-  cluster_addons = {
-    coredns    = {}
-    kube-proxy = {}
-    vpc-cni    = {}
-    aws-ebs-csi-driver = {
-      service_account_role_arn = module.ebs_csi_irsa_role.iam_role_arn
-    }
-  }
-
-  eks_managed_node_groups = {
-    ng-app = {
-      instance_types = ["t3.medium"]
-      min_size       = 4
-      max_size       = 4
-      desired_size   = 4
-      labels = {
-        type = "ec2"
-      }
-      iam_role_additional_policies = {
-        ebs = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
-        lb  = "arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess"
-      }
-    }
-  }
-}
-
-module "ebs_csi_irsa_role" {
-  source                = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  role_name             = "ebs-csi-controller"
-  attach_ebs_csi_policy = true
-
-  oidc_providers = {
-    ex = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
-    }
-  }
-}
-
-module "load_balancer_controller_irsa_role" {
-  source                                 = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  role_name                              = "AmazonEKSLoadBalancerControllerRole"
-  attach_load_balancer_controller_policy = true
-
-  oidc_providers = {
-    ex = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:aws-load-balancer-controller"]
-    }
-  }
-}
-
-resource "kubernetes_service_account" "lb_service_account" {
-  metadata {
-    name      = "aws-load-balancer-controller"
-    namespace = "kube-system"
-    labels = {
-      "app.kubernetes.io/name"      = "aws-load-balancer-controller"
-      "app.kubernetes.io/component" = "controller"
-    }
-    annotations = {
-      "eks.amazonaws.com/role-arn"               = module.load_balancer_controller_irsa_role.iam_role_arn
-      "eks.amazonaws.com/sts-regional-endpoints" = "true"
-    }
-  }
-
-  depends_on = [module.eks]
-}
-
-resource "helm_release" "lb" {
-  name       = "aws-load-balancer-controller"
-  repository = "https://aws.github.io/eks-charts"
-  chart      = "aws-load-balancer-controller"
-  namespace  = "kube-system"
-  depends_on = [
-    kubernetes_service_account.lb_service_account
-  ]
-
-  set {
-    name  = "region"
-    value = "us-east-2"
-  }
-
-  set {
-    name  = "vpcId"
-    value = module.vpc.vpc_id
-  }
-
-  set {
-    name  = "serviceAccount.create"
-    value = "false"
-  }
-
-  set {
-    name  = "serviceAccount.name"
-    value = "aws-load-balancer-controller"
-  }
-
-  set {
-    name  = "clusterName"
-    value = module.eks.cluster_name
-  }
+resource "azurerm_role_assignment" "appgtw_ingress_role_assignment" {
+  scope                = azurerm_virtual_network.aks_vnet.id
+  role_definition_name = "Contributor"
+  principal_id         = azurerm_kubernetes_cluster.aks.ingress_application_gateway[0].ingress_application_gateway_identity[0].object_id
 }

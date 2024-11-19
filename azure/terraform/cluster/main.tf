@@ -35,10 +35,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
   dns_prefix          = "aks-${local.aks_name}"
 
   default_node_pool {
-    name               = "default"
-    node_count         = local.node_count
-    vm_size            = local.node_vm_size
-    vnet_subnet_id     = azurerm_subnet.aks_subnet.id
+    name           = "default"
+    node_count     = local.node_count
+    vm_size        = local.node_vm_size
+    vnet_subnet_id = azurerm_subnet.aks_subnet.id
   }
 
   sku_tier = "Free"
@@ -53,7 +53,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   ingress_application_gateway {
     gateway_name = local.appgw_name
-    subnet_cidr = local.appgw_subnet_cidr
+    subnet_cidr  = local.appgw_subnet_cidr
   }
 }
 

@@ -6,7 +6,7 @@ resource "kubernetes_namespace" "codeflix" {
 }
 
 data "azurerm_key_vault" "codeflix_vault" {
-  name                = "codeflix-secrets-fc" 
+  name                = "codeflix-secrets-fc"
   resource_group_name = "secrets-rg"
 }
 

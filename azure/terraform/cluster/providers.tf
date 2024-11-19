@@ -3,12 +3,12 @@ terraform {
 
   required_providers {
     azurerm = {
-      source = "hashicorp/azurerm"
+      source  = "hashicorp/azurerm"
       version = "4.10.0"
     }
   }
 
-   backend "azurerm" {
+  backend "azurerm" {
     resource_group_name  = "fullcycle-terraform-rg"
     storage_account_name = "fcremotestatetf"
     container_name       = "tfstate"

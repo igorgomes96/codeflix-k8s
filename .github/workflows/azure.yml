@@ -1,0 +1,65 @@
+name: 'Deploy Azure'
+
+on:
+  push:
+    branches: [ "section/5_azure_aks" ]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  ARM_CLIENT_ID:  ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET:  ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_TENANT_ID:  ${{ secrets.ARM_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID:  ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  CLUSTER_NAME: aks-fullcycle
+  CLUSTER_RESOURCE_GROUP: aks-fullcycle-rg
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    environment: production
+    strategy:
+      max-parallel: 1
+      matrix:
+        directory:
+          - azure/terraform/cluster
+          - azure/terraform/crds
+          - azure/terraform/manifests
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install Azure CLI
+      if: matrix.directory != 'azure/terraform/cluster'
+      run: |
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+    - name: Update kubeconfig for AKS
+      if: matrix.directory != 'azure/terraform/cluster'
+      run: |
+        az login --service-principal -u ${{ secrets.ARM_CLIENT_ID }} -p ${{ secrets.ARM_CLIENT_SECRET }} --tenant ${{ secrets.ARM_TENANT_ID }}
+        az aks get-credentials -g ${{ env.CLUSTER_RESOURCE_GROUP }} -n ${{ env.CLUSTER_NAME }}
+      
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Terraform Init
+      run: terraform -chdir=${{ matrix.directory }} init
+
+    - name: Terraform Format
+      run: terraform -chdir=${{ matrix.directory }} fmt -check
+
+    - name: Terraform Plan
+      run: terraform -chdir=${{ matrix.directory }} plan -input=false
+
+    - name: Terraform Apply
+      run: terraform -chdir=${{ matrix.directory }} apply -auto-approve -input=false

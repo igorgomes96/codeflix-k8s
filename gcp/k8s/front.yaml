@@ -17,5 +17,12 @@ spec:
     spec:
       containers:
         - name: front
-          image: igorgomes96/fc3-admin-catalogo-de-videos-react:v5
+          image: igorgomes96/fc3-admin-catalogo-de-videos-react:v10
           imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 600m
+              memory: 500Mi
+            limits:
+              cpu: 700m
+              memory: 600Mi

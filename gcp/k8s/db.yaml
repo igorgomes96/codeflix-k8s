@@ -25,6 +25,13 @@ spec:
                   key: password
           ports:
             - containerPort: 3306
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 300m
+              memory: 512Mi
           volumeMounts:
             - mountPath: /var/lib/mysql
               name: mysql-volume

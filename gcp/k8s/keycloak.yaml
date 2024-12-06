@@ -22,13 +22,8 @@ spec:
     strict: false
   resources:
     requests:
-      cpu: 800m
+      cpu: 200m
       memory: 512Mi
     limits:
-      cpu: 1000m
-      memory: 1Gi
-  unsupported:
-    podTemplate:
-      metadata:
-        labels:
-          schedule_on: fargate
+      cpu: 500m
+      memory: 512Mi

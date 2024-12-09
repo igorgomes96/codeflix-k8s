@@ -2,9 +2,9 @@ terraform {
   required_version = "~> 1.9"
 
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
+    google = {
+      source  = "hashicorp/google"
+      version = "6.12.0"
     }
 
     kubernetes = {
@@ -18,15 +18,15 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket         = "codeflix-terraform"
-    key            = "states/terraform.manifests.tfstate"
-    dynamodb_table = "tf-state-locking"
+  backend "gcs" {
+    bucket = "codeflix-terraform"
+    prefix = "states/terraform.manifests.tfstate"
   }
 }
 
-provider "aws" {
-  region = "us-east-2"
+provider "google" {
+  project = "fc3-deploy"
+  region  = "us-central1"
 }
 
 provider "kubernetes" {

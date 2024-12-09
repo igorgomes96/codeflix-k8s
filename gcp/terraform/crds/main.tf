@@ -5,17 +5,17 @@ resource "kubernetes_namespace" "codeflix" {
   wait_for_default_service_account = true
 }
 
-data "aws_secretsmanager_secret_version" "db_secret" {
-  secret_id = "DbSecret"
+data "google_secret_manager_secret_version" "db_secret" {
+  secret = "DbSecret"
 }
 
-data "aws_secretsmanager_secret_version" "rmq_secret" {
-  secret_id = "RmqSecret"
+data "google_secret_manager_secret_version" "rmq_secret" {
+  secret = "RmqSecret"
 }
 
 locals {
-  db_secret_data   = jsondecode(data.aws_secretsmanager_secret_version.db_secret.secret_string)
-  rmq_secret_data  = jsondecode(data.aws_secretsmanager_secret_version.rmq_secret.secret_string)
+  db_secret_data   = jsondecode(data.google_secret_manager_secret_version.db_secret.secret_data)
+  rmq_secret_data  = jsondecode(data.google_secret_manager_secret_version.rmq_secret.secret_data)
   keycloak_objects = [for obj in split("---", file("../../k8s/keycloak-operator.yaml")) : yamldecode(obj) if obj != ""]
 }
 
@@ -84,12 +84,6 @@ resource "helm_release" "rmq_operator" {
   name       = "rabbitmq-cluster-operator"
   repository = "https://charts.bitnami.com/bitnami"
   chart      = "rabbitmq-cluster-operator"
-  depends_on = [kubernetes_namespace.codeflix]
-}
-
-resource "helm_release" "eck" {
-  name       = "eck-operator"
-  repository = "https://helm.elastic.co"
-  chart      = "eck-operator"
+  version    = "4.3.25"
   depends_on = [kubernetes_namespace.codeflix]
 }

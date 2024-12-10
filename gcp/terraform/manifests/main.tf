@@ -88,7 +88,7 @@ resource "kubernetes_manifest" "admin_catalog" {
   }
 
   computed_fields = ["spec.template.spec"]
-  depends_on = [kubernetes_manifest.rmq_topology]
+  depends_on      = [kubernetes_manifest.rmq_topology]
 }
 
 resource "kubernetes_manifest" "admin_catalog_service" {

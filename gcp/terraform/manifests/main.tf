@@ -16,6 +16,8 @@ resource "kubernetes_manifest" "db" {
     update = "2m"
     delete = "30s"
   }
+
+  computed_fields = ["spec.template.spec"]
 }
 
 resource "kubernetes_manifest" "db-service" {
@@ -85,6 +87,7 @@ resource "kubernetes_manifest" "admin_catalog" {
     delete = "30s"
   }
 
+  computed_fields = ["spec.template.spec"]
   depends_on = [kubernetes_manifest.rmq_topology]
 }
 
@@ -92,26 +95,26 @@ resource "kubernetes_manifest" "admin_catalog_service" {
   manifest = yamldecode(file("../../k8s/admin-catalog-service.yaml"))
 }
 
-resource "kubernetes_manifest" "front_admin_catalog" {
-  manifest = yamldecode(file("../../k8s/front.yaml"))
-  wait {
-    rollout = true
-  }
+# resource "kubernetes_manifest" "front_admin_catalog" {
+#   manifest = yamldecode(file("../../k8s/front.yaml"))
+#   wait {
+#     rollout = true
+#   }
 
-  timeouts {
-    create = "2m"
-    update = "2m"
-    delete = "30s"
-  }
+#   timeouts {
+#     create = "2m"
+#     update = "2m"
+#     delete = "30s"
+#   }
 
-  depends_on = [kubernetes_manifest.admin_catalog]
-}
+#   depends_on = [kubernetes_manifest.admin_catalog]
+# }
 
-resource "kubernetes_manifest" "front_admin_catalog_service" {
-  manifest = yamldecode(file("../../k8s/front-service.yaml"))
-}
+# resource "kubernetes_manifest" "front_admin_catalog_service" {
+#   manifest = yamldecode(file("../../k8s/front-service.yaml"))
+# }
 
-resource "kubernetes_manifest" "ingress" {
-  manifest   = yamldecode(file("../../k8s/ingress.yaml"))
-  depends_on = [kubernetes_manifest.admin_catalog_service]
-}
+# resource "kubernetes_manifest" "ingress" {
+#   manifest   = yamldecode(file("../../k8s/ingress.yaml"))
+#   depends_on = [kubernetes_manifest.admin_catalog_service]
+# }

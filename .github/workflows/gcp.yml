@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  CLUSTER_NAME: aks-fullcycle
+  CLUSTER_NAME: fc3
   CLUSTER_LOCATION: us-central1
 
 permissions:

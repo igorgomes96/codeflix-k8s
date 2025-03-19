@@ -1,0 +1,68 @@
+name: 'Deploy GCP'
+
+on:
+  push:
+    branches: [ "section/7_gpc_gke" ]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  CLUSTER_NAME: fc3
+  CLUSTER_LOCATION: us-central1
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    environment: production
+    strategy:
+      max-parallel: 1
+      matrix:
+        directory:
+          - gcp/terraform/cluster
+          - gcp/terraform/crds
+          - gcp/terraform/manifests
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v2'  
+
+    - name: Install gke-gcloud-auth-plugin
+      if: matrix.directory != 'gcp/terraform/cluster'
+      run: |
+        gcloud components install gke-gcloud-auth-plugin
+        export USE_GKE_GCLOUD_AUTH_PLUGIN=True   
+
+    - name: Update kubeconfig for GKE
+      if: matrix.directory != 'gcp/terraform/cluster'
+      run: gcloud container clusters get-credentials ${{ env.CLUSTER_NAME }} --location=${{ env.CLUSTER_LOCATION }}   
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Terraform Init
+      run: terraform -chdir=${{ matrix.directory }} init
+
+    - name: Terraform Format
+      run: terraform -chdir=${{ matrix.directory }} fmt -check
+
+    - name: Terraform Plan
+      run: terraform -chdir=${{ matrix.directory }} plan -input=false
+
+    - name: Terraform Apply
+      run: terraform -chdir=${{ matrix.directory }} apply -auto-approve -input=false

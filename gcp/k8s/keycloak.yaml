@@ -1,0 +1,29 @@
+apiVersion: k8s.keycloak.org/v2alpha1
+kind: Keycloak
+metadata:
+  name: keycloak
+  namespace: codeflix
+spec:
+  instances: 1
+  db:
+    vendor: mysql
+    host: mysql-0.mysql-h.codeflix.svc.cluster.local
+    usernameSecret:
+      name: db-secret
+      key: username
+    passwordSecret:
+      name: db-secret
+      key: password
+  http:
+    httpEnabled: true
+  proxy:
+    headers: xforwarded
+  hostname:
+    strict: false
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
